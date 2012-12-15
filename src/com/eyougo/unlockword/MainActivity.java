@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +24,9 @@ public class MainActivity extends Activity {
 	private String correctAnster;
 	private LockLayer lockLayer;
 	private View lockView;
+	private String word;
+	private int process;
+	private WordDatabaseHelper wordDatabaseHelper;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -41,19 +45,20 @@ public class MainActivity extends Activity {
 	}
 
 	private void initViews(View lockView) {
+		wordDatabaseHelper = new WordDatabaseHelper(this);
+		WordItem wordItem = wordDatabaseHelper.getRandomWordItem("word_kaoyan");
+		
+		List<WordItem> otherItems = wordDatabaseHelper.getRandomOtherWordItemList(3, "word_kaoyan", wordItem.getWord());
+		
 		// 设置单词
 		TextView textView = (TextView) lockView.findViewById(R.id.word);
-		textView.setText("maybe");
+		word = wordItem.getWord();
+		process = wordItem.getProcess();
+		textView.setText(word);
 
 		// 设置正确答案
-		correctAnster = "也许";
-
-		// 获取干扰答案
-		List<String> otherAnsters = new ArrayList<String>(3);
-		otherAnsters.add("测试你妹的啊啊");
-		otherAnsters.add("这只是开始");
-		otherAnsters.add("我擦他大爷");
-
+		correctAnster = wordItem.getTrans();
+		
 		// 随机一个位置
 		Random random = new Random();
 		int location = random.nextInt(4);
@@ -65,7 +70,7 @@ public class MainActivity extends Activity {
 			if (i == location) {
 				ansters.add(correctAnster);
 			} else {
-				ansters.add(otherAnsters.get(other));
+				ansters.add(otherItems.get(other).getTrans());
 				other++;
 			}
 		}
@@ -99,6 +104,8 @@ public class MainActivity extends Activity {
 				Toast.makeText(getBaseContext(), "回答正确！解锁成功", Toast.LENGTH_SHORT)
 						.show();
 				lockLayer.unlock();
+				wordDatabaseHelper.processForword(word, process, false);
+				wordDatabaseHelper.close();
 				finish();
 			}
 
