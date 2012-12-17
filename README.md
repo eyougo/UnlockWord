@@ -11,6 +11,7 @@ Android lock screen application in order to memorize words.
  2. 关闭屏幕时，来电应答的显示。
  3. 随机取干扰答案是连续的。
  4. 忘了显示音标。
+ 5. 忘了开机自启动。
 
 考虑：
  1. 通过Service注册屏幕变暗的广播能否与用户进入的广播结合使用。
