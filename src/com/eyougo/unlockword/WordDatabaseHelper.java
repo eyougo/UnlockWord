@@ -128,7 +128,6 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 		List<String> argList = new ArrayList<String>();
 		sqlBuffer.append("select t.trans from " )
 			.append(table).append(" t ");
-		argList.add(String.valueOf(TOP_PROCESS_VALUE));
 		if (exceptWord != null) {
 			sqlBuffer.append("where t.word != ? ");
 			argList.add(exceptWord);
