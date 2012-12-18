@@ -56,11 +56,11 @@ public class MainActivity extends Activity {
 		wordDatabaseHelper = new WordDatabaseHelper(this);
 		WordItem wordItem = wordDatabaseHelper.getRandomWordItem("word_kaoyan", null);
 		
-		List<WordItem> otherItems = new ArrayList<WordItem>();
-		while (otherItems.size() < 3) {
-			WordItem otherItem = wordDatabaseHelper.getRandomWordItem("word_kaoyan", wordItem.getWord());
-			if (!otherItems.contains(otherItem.getWord())) {
-				otherItems.add(otherItem);
+		List<String> otherTrans = new ArrayList<String>();
+		while (otherTrans.size() < 3) {
+			String trans = wordDatabaseHelper.getRandomOtherTrans("word_kaoyan", wordItem.getWord());
+			if (!otherTrans.contains(trans)) {
+				otherTrans.add(trans);
 			}	
 		}
 		
@@ -88,7 +88,7 @@ public class MainActivity extends Activity {
 			if (i == location) {
 				ansters.add(correctAnster);
 			} else {
-				ansters.add(otherItems.get(other).getTrans());
+				ansters.add(otherTrans.get(other));
 				other++;
 			}
 		}

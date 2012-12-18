@@ -120,6 +120,28 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 		return wordItem;
 	}
 	
+	public String getRandomOtherTrans(String table, String exceptWord){
+		int count = getWordCount(table);
+		Random random = new Random();
+		int offset = random.nextInt(count);
+		StringBuffer sqlBuffer = new StringBuffer();
+		List<String> argList = new ArrayList<String>();
+		sqlBuffer.append("select t.trans from " )
+			.append(table).append(" t ");
+		argList.add(String.valueOf(TOP_PROCESS_VALUE));
+		if (exceptWord != null) {
+			sqlBuffer.append("where t.word != ? ");
+			argList.add(exceptWord);
+		}
+		sqlBuffer.append(" limit 1 offset ?");
+		argList.add(String.valueOf(offset));
+		Cursor cursor = wordDataBase.rawQuery(sqlBuffer.toString(), argList.toArray(new String[]{}));
+		cursor.moveToFirst();
+		String trans = cursor.getString(cursor.getColumnIndex("trans"));
+		cursor.close();
+		return trans;
+	}
+	
 	public int processBackward(String word, int process){
 		if (process > 0) {
 			wordDataBase.beginTransaction();
