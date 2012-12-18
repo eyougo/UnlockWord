@@ -22,8 +22,8 @@ public class LockService extends Service {
 		Log.i(TAG, "service create");
 		
 		lockIntent = new Intent(LockService.this , MainActivity.class);
-		//lockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		lockIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);  
+		//lockIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT); 
+		lockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
 		
 		/*注册广播*/
 		IntentFilter mScreenOffFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
