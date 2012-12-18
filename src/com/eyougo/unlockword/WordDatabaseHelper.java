@@ -92,15 +92,23 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 		return list;
 	}
 	
-	public WordItem getRandomWordItem(String table){
+	public WordItem getRandomWordItem(String table, String exceptWord){
 		int count = getWordCount(table);
 		Random random = new Random();
 		int offset = random.nextInt(count);
-		String sql = "select t.word, t.trans, t.phonetic, t.tags, p.process from " + table +
-				" t left join word_process p on t.word = p.word" +
-				" where process < ? or process is null limit 1 offset ?";
-		Cursor cursor = wordDataBase.rawQuery(sql, 
-				new String[]{String.valueOf(TOP_PROCESS_VALUE), String.valueOf(offset)});
+		StringBuffer sqlBuffer = new StringBuffer();
+		List<String> argList = new ArrayList<String>();
+		sqlBuffer.append("select t.word, t.trans, t.phonetic, t.tags, p.process from " )
+			.append(table).append(" t left join word_process p on t.word = p.word")
+			.append(" where (process < ? or process is null) ");
+		argList.add(String.valueOf(TOP_PROCESS_VALUE));
+		if (exceptWord != null) {
+			sqlBuffer.append("and t.word != ? ");
+			argList.add(exceptWord);
+		}
+		sqlBuffer.append(" limit 1 offset ?");
+		argList.add(String.valueOf(offset));
+		Cursor cursor = wordDataBase.rawQuery(sqlBuffer.toString(), argList.toArray(new String[]{}));
 		cursor.moveToFirst();
 		WordItem wordItem = new WordItem();
 		wordItem.setWord(cursor.getString(cursor.getColumnIndex("word")));
@@ -112,7 +120,21 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 		return wordItem;
 	}
 	
-	public void processForword(String word, int process, boolean top){
+	public int processBackward(String word, int process){
+		if (process > 0) {
+			wordDataBase.beginTransaction();
+			ContentValues values = new ContentValues();
+			process --;
+			values.put("process", process);
+			wordDataBase.update("word_process", values, " word = ? ", new String[]{word});
+		
+			wordDataBase.setTransactionSuccessful();
+			wordDataBase.endTransaction();
+		}
+		return process;
+	}
+	
+	public void processForward(String word, int process, boolean top){
 		wordDataBase.beginTransaction();
 		if (process > 0) {
 			ContentValues values = new ContentValues();

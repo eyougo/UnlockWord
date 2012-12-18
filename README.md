@@ -5,13 +5,13 @@ Android lock screen application in order to memorize words.
 
 已解决问题：
  1. 与4.0系统的兼容。
+ 2. 干扰答案随机。
+ 3. 开机启动。
+ 4. 显示音标。
 
 待解决问题：
  1. 锁屏Activity启动时，关闭屏幕，Service又一次启动Activity。
  2. 关闭屏幕时，来电应答的显示。
- 3. 随机取干扰答案是连续的。
- 4. 忘了显示音标。
- 5. 忘了开机自启动。
 
 考虑：
  1. 通过Service注册屏幕变暗的广播能否与用户进入的广播结合使用。

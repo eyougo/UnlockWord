@@ -37,4 +37,19 @@ public class WordItem {
 	public void setProcess(int process) {
 		this.process = process;
 	}
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) return true;
+        if(o == null) return false;
+        if(getClass() != o.getClass()) return false;
+        WordItem other = (WordItem)o;
+        if (this.word == other.getWord()) {
+			return true;
+		}
+        if (this.word == null){
+        	return false;
+        }
+		return this.word.equals(other.getWord());
+	}
+	
 }

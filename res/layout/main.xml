@@ -8,10 +8,16 @@
     <TextView
        	android:id="@+id/word"
         android:layout_width="fill_parent"
-        android:layout_height="80dip"
+        android:layout_height="50dip"
         android:textSize="40sp" 
         android:gravity="bottom"/>
 
+    <TextView
+       	android:id="@+id/phonetic"
+        android:layout_width="fill_parent"
+        android:layout_height="30dip"
+        android:textSize="20sp" 
+        android:gravity="bottom"/>
     <RadioGroup
         android:id="@+id/radioGroup"
         android:layout_width="fill_parent"
@@ -37,5 +43,11 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" />
     </RadioGroup>
+
+    <Button
+        android:id="@+id/closeButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@+string/close" />
 
 </LinearLayout>

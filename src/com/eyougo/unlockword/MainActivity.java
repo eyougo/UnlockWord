@@ -5,14 +5,19 @@ import java.util.List;
 import java.util.Random;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -26,6 +31,7 @@ public class MainActivity extends Activity {
 	private View lockView;
 	private String word;
 	private int process;
+	private boolean firstRight = true;
 	private WordDatabaseHelper wordDatabaseHelper;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,24 +44,36 @@ public class MainActivity extends Activity {
 		lockLayer = LockLayer.getInstance(this);
 		lockLayer.setLockView(lockView);
 		lockLayer.lock();
-		//System.out.println(android.os.Build.VERSION.SDK);
-		//lockView.setVisibility(View.VISIBLE);
 
 		startService(new Intent(MainActivity.this, LockService.class));
 	}
 
 	private void initViews(View lockView) {
-		wordDatabaseHelper = new WordDatabaseHelper(this);
-		WordItem wordItem = wordDatabaseHelper.getRandomWordItem("word_kaoyan");
+		// 隐藏关闭按钮
+		Button closeButton = (Button)lockView.findViewById(R.id.closeButton);
+		closeButton.setVisibility(View.GONE);
 		
-		List<WordItem> otherItems = wordDatabaseHelper.getRandomOtherWordItemList(3, "word_kaoyan", wordItem.getWord());
+		wordDatabaseHelper = new WordDatabaseHelper(this);
+		WordItem wordItem = wordDatabaseHelper.getRandomWordItem("word_kaoyan", null);
+		
+		List<WordItem> otherItems = new ArrayList<WordItem>();
+		while (otherItems.size() < 3) {
+			WordItem otherItem = wordDatabaseHelper.getRandomWordItem("word_kaoyan", wordItem.getWord());
+			if (!otherItems.contains(otherItem.getWord())) {
+				otherItems.add(otherItem);
+			}	
+		}
 		
 		// 设置单词
 		TextView textView = (TextView) lockView.findViewById(R.id.word);
+		TextView phoneticTextView = (TextView) lockView.findViewById(R.id.phonetic);
 		word = wordItem.getWord();
 		process = wordItem.getProcess();
+		String phonetic = wordItem.getPhonetic();
 		textView.setText(word);
-
+		Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/lsansuni.ttf");
+		phoneticTextView.setTypeface(typeface);
+		phoneticTextView.setText("    "+phonetic);
 		// 设置正确答案
 		correctAnster = wordItem.getTrans();
 		
@@ -100,13 +118,33 @@ public class MainActivity extends Activity {
 			RadioButton radioButton = (RadioButton) lockView.findViewById(checkedId);
 			String anster = String.valueOf(radioButton.getText());
 			Log.i(TAG, "checkedId="+checkedId+",anster="+anster );
-			if (anster != null && anster.equals(correctAnster)) {
-				Toast.makeText(getBaseContext(), "回答正确！解锁成功", Toast.LENGTH_SHORT)
-						.show();
+			if (anster == null) {
 				lockLayer.unlock();
-				wordDatabaseHelper.processForword(word, process, false);
 				wordDatabaseHelper.close();
-				finish();
+			}
+			if (!anster.equals(correctAnster)) {
+				firstRight = false;
+				process = wordDatabaseHelper.processBackward(word, process);
+			}
+			if (anster.equals(correctAnster)) {
+				Toast.makeText(getBaseContext(), "恭喜你，答对了！", Toast.LENGTH_SHORT)
+						.show();
+				if (!firstRight) {
+					SpannableStringBuilder style=new SpannableStringBuilder(correctAnster);  
+			        style.setSpan(new ForegroundColorSpan(Color.RED),0,correctAnster.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			        radioButton.setText(style);
+			        // 显示关闭按钮
+			        Button closeButton = (Button)lockView.findViewById(R.id.closeButton);
+					closeButton.setVisibility(View.VISIBLE);
+					closeButton.setOnClickListener(new closeButtonOnClickListener());
+					wordDatabaseHelper.close();
+				}else {
+					wordDatabaseHelper.processForward(word, process, false);
+					wordDatabaseHelper.close();
+					lockLayer.unlock();
+					finish();
+				}
+				
 			}
 
 		}
@@ -129,6 +167,16 @@ public class MainActivity extends Activity {
 		else
 			return super.onKeyDown(keyCode, event);
 
+	}
+	
+	private class closeButtonOnClickListener implements View.OnClickListener{
+
+		@Override
+		public void onClick(View v) {
+			lockLayer.unlock();
+			finish();
+		}
+		
 	}
 
 }
