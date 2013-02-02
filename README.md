@@ -1,7 +1,7 @@
 UnlockWord
 ==========
 
-Android lock screen application in order to memorize words.
+Android lock screen application in order to memorize english words.
 
 已解决问题：
  1. 与4.0系统的兼容。
