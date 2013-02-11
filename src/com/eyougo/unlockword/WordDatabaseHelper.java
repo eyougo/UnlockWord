@@ -14,7 +14,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.R.integer;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;

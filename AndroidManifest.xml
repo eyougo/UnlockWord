@@ -8,7 +8,9 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="16" />
 	
-	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"></uses-permission>
+	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+	
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -22,6 +24,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".LockService"></service>
+		<receiver android:name=".BootCompletedReceiver"> 
+    		<intent-filter> 
+        		<action android:name="android.intent.action.BOOT_COMPLETED" /> 
+    		</intent-filter> 
+		</receiver>
+		<service android:name=".LockService"></service>
     </application>
 </manifest>

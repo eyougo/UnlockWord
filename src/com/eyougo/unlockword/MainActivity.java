@@ -17,7 +17,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -26,12 +25,11 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	private static String TAG = "UnlockWord";
-	private String correctAnster;
+	private String correctAnswer;
 	private LockLayer lockLayer;
 	private View lockView;
 	private String word;
 	private int process;
-	private boolean firstRight = true;
 	private WordDatabaseHelper wordDatabaseHelper;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +47,9 @@ public class MainActivity extends Activity {
 	}
 
 	private void initViews(View lockView) {
-		// 隐藏关闭按钮
-		Button closeButton = (Button)lockView.findViewById(R.id.closeButton);
-		closeButton.setVisibility(View.GONE);
+		// 隐藏提示
+		TextView tips = (TextView)lockView.findViewById(R.id.tips);
+		tips.setVisibility(View.GONE);
 		
 		wordDatabaseHelper = new WordDatabaseHelper(this);
 		WordItem wordItem = wordDatabaseHelper.getRandomWordItem("word_kaoyan", null);
@@ -75,7 +73,7 @@ public class MainActivity extends Activity {
 		phoneticTextView.setTypeface(typeface);
 		phoneticTextView.setText("    "+phonetic);
 		// 设置正确答案
-		correctAnster = wordItem.getTrans();
+		correctAnswer = wordItem.getTrans();
 		
 		// 随机一个位置
 		Random random = new Random();
@@ -83,25 +81,25 @@ public class MainActivity extends Activity {
 
 		// 初始化答案
 		int other = 0;
-		List<String> ansters = new ArrayList<String>(4);
+		List<String> answers = new ArrayList<String>(4);
 		for (int i = 0; i < 4; i++) {
 			if (i == location) {
-				ansters.add(correctAnster);
+				answers.add(correctAnswer);
 			} else {
-				ansters.add(otherTrans.get(other));
+				answers.add(otherTrans.get(other));
 				other++;
 			}
 		}
 
 		// 设置按钮
 		RadioButton radioButton0 = (RadioButton) lockView.findViewById(R.id.radio0);
-		radioButton0.setText(ansters.get(0));
+		radioButton0.setText(answers.get(0));
 		RadioButton radioButton1 = (RadioButton) lockView.findViewById(R.id.radio1);
-		radioButton1.setText(ansters.get(1));
+		radioButton1.setText(answers.get(1));
 		RadioButton radioButton2 = (RadioButton) lockView.findViewById(R.id.radio2);
-		radioButton2.setText(ansters.get(2));
+		radioButton2.setText(answers.get(2));
 		RadioButton radioButton3 = (RadioButton) lockView.findViewById(R.id.radio3);
-		radioButton3.setText(ansters.get(3));
+		radioButton3.setText(answers.get(3));
 
 		// 设置处理
 		RadioGroup radioGroup = (RadioGroup) lockView.findViewById(R.id.radioGroup);
@@ -116,39 +114,35 @@ public class MainActivity extends Activity {
 		@Override
 		public void onCheckedChanged(RadioGroup group, int checkedId) {
 			RadioButton radioButton = (RadioButton) lockView.findViewById(checkedId);
-			String anster = String.valueOf(radioButton.getText());
-			Log.i(TAG, "checkedId="+checkedId+",anster="+anster );
-			if (anster == null) {
+			String answer = String.valueOf(radioButton.getText());
+			Log.i(TAG, "checkedId="+checkedId+",answer="+answer );
+			if (answer == null) {
 				lockLayer.unlock();
 				wordDatabaseHelper.close();
 			}
-			if (!anster.equals(correctAnster)) {
-				firstRight = false;
-				process = wordDatabaseHelper.processBackward(word, process);
-			}
-			if (anster.equals(correctAnster)) {
+			if (answer.equals(correctAnswer)) {
 				Toast.makeText(getBaseContext(), "恭喜你，答对了！", Toast.LENGTH_SHORT)
 						.show();
-				if (!firstRight) {
-					SpannableStringBuilder style=new SpannableStringBuilder(correctAnster);  
-			        style.setSpan(new ForegroundColorSpan(Color.RED),0,correctAnster.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-			        radioButton.setText(style);
-			        // 显示关闭按钮
-			        Button closeButton = (Button)lockView.findViewById(R.id.closeButton);
-					closeButton.setVisibility(View.VISIBLE);
-					closeButton.setOnClickListener(new closeButtonOnClickListener());
-					wordDatabaseHelper.close();
-				}else {
-					wordDatabaseHelper.processForward(word, process, false);
-					wordDatabaseHelper.close();
-					lockLayer.unlock();
-					finish();
+				wordDatabaseHelper.processForward(word, process, false);
+				wordDatabaseHelper.close();
+				lockLayer.unlock();
+				finish();
+			}else{
+				RadioGroup radioGroup = (RadioGroup) lockView.findViewById(R.id.radioGroup);
+				int c = radioGroup.getChildCount();
+				for (int i=0; i < c; i++){
+					RadioButton button = (RadioButton)radioGroup.getChildAt(i);
+					if(button.getText().equals(correctAnswer)){
+						SpannableStringBuilder style=new SpannableStringBuilder(correctAnswer);  
+				        style.setSpan(new ForegroundColorSpan(Color.RED),0,correctAnswer.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				        button.setText(style);
+					}
 				}
-				
+		        // 显示提示
+		        TextView tips = (TextView)lockView.findViewById(R.id.tips);
+		        tips.setVisibility(View.VISIBLE);
 			}
-
 		}
-
 	}
 
 	// 屏蔽掉Home键
@@ -167,16 +161,6 @@ public class MainActivity extends Activity {
 		else
 			return super.onKeyDown(keyCode, event);
 
-	}
-	
-	private class closeButtonOnClickListener implements View.OnClickListener{
-
-		@Override
-		public void onClick(View v) {
-			lockLayer.unlock();
-			finish();
-		}
-		
 	}
 
 }
