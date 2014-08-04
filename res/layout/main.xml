@@ -1,55 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#FFFFFF"
-    android:orientation="vertical" >
-
-    <TextView
-        android:id="@+id/word"
-        android:layout_width="fill_parent"
-        android:layout_height="50dip"
-        android:gravity="bottom"
-        android:textSize="40sp" />
-
-    <TextView
-        android:id="@+id/phonetic"
-        android:layout_width="fill_parent"
-        android:layout_height="30dip"
-        android:gravity="bottom"
-        android:textSize="20sp" />
-
-    <RadioGroup
-        android:id="@+id/radioGroup"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-
-        <RadioButton
-            android:id="@+id/radio0"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-
-        <RadioButton
-            android:id="@+id/radio1"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-
-        <RadioButton
-            android:id="@+id/radio2"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-
-        <RadioButton
-            android:id="@+id/radio3"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-    </RadioGroup>
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/tips"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/right" />
+        android:layout_height="match_parent"
+        android:gravity="center|center_vertical"
+        android:text="@string/data_init"
+        android:layout_gravity="center_vertical" />
 
 </LinearLayout>

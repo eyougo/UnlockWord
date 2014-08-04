@@ -1,7 +1,9 @@
-package com.eyougo.unlockword;
+package com.eyougo.unlockword.data;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -18,6 +20,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
@@ -32,13 +35,86 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 			" word TEXT PRIMARY KEY, process INTEGER)";
 	
 	private SQLiteDatabase wordDataBase;
+
 	private final Context context;
-	
-	public WordDatabaseHelper(Context context) {
+
+    private static WordDatabaseHelper instance;
+
+    public static void init(Context context){
+        if (instance == null) {
+            instance = new WordDatabaseHelper(context);
+        }
+    }
+
+    public static WordDatabaseHelper getInstance(Context context){
+        if (instance == null) {
+            instance = new WordDatabaseHelper(context);
+        }
+        instance.wordDataBase = instance.getWritableDatabase();
+        return instance;
+    }
+
+	private WordDatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		this.context = context;
-		wordDataBase = this.getWritableDatabase();
+
+        initDatabaseIfNeed(context);
 	}
+
+    private void initDatabaseIfNeed(Context context){
+        String path = context.getDatabasePath(DATABASE_NAME).getPath();
+        SQLiteDatabase db = null;
+        try {
+            db = SQLiteDatabase.openDatabase(path, null, SQLiteDatabase.OPEN_READONLY);
+        }catch (SQLiteException e){
+
+        }finally {
+            if (db != null){
+                db.close();
+            }
+        }
+        if (db == null){
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+
+            try {
+                inputStream = context.getAssets().open(DATABASE_NAME);
+                String outFileName = path + DATABASE_NAME;
+                outputStream = new FileOutputStream(outFileName);
+
+                byte[]buffer = new byte[1024];
+                int length;
+                while ((length = inputStream.read(buffer)) > 0) {
+                    outputStream.write(buffer, 0, length);
+                }
+
+                //Close the streams
+                outputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (outputStream != null){
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                    }
+                }
+                if (inputStream != null){
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                    }
+                }
+            }
+        }
+
+
+        this.wordDataBase = this.getWritableDatabase();
+        //创建进度表
+        this.wordDataBase.execSQL(CREATE_WORDPROCESS_TABLE_SQL);
+        Log.i(TAG,"create word process table");
+        this.wordDataBase.close();
+    }
 	
 	public void close(){
 		wordDataBase.close();
@@ -46,12 +122,6 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		//创建进度表
-		db.execSQL(CREATE_WORDPROCESS_TABLE_SQL);
-		Log.i(TAG,"create word process table");
-		//默认导入单词表
-		importWordTable(DEFAULT_WORD_FILE, DEFAULT_WORD_TABLE, db);
-		Log.i(TAG,"create defaul word table");
 	}
 
 	@Override
@@ -195,7 +265,7 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 			inputSource.setEncoding("UTF-8");
 			xmlReader.parse(inputSource);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.e(TAG,e.getMessage(),e);
 		} finally{
 			if (inputStream != null) {
 				try {
@@ -291,7 +361,7 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 				values.put("trans", wordItem.getTrans());
 				values.put("phonetic", wordItem.getPhonetic());
 				values.put("tags", wordItem.getTags());
-				db.insert(tableName, null, values);
+				db.insertWithOnConflict(tableName, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 			}
 		}
 		

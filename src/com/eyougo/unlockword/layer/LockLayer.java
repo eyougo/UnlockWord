@@ -1,4 +1,4 @@
-package com.eyougo.unlockword;
+package com.eyougo.unlockword.layer;
 
 import android.app.Activity;
 import android.view.View;

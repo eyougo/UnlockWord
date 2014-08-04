@@ -1,4 +1,4 @@
-package com.eyougo.unlockword;
+package com.eyougo.unlockword.data;
 
 public class WordItem {
 	private String word;
