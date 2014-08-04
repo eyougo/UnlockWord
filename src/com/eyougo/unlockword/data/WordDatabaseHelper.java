@@ -1,5 +1,6 @@
 package com.eyougo.unlockword.data;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +17,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
+import android.app.Application;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -25,7 +27,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class WordDatabaseHelper extends SQLiteOpenHelper {
-	private static String TAG = "WordDatabase";
+	private static String TAG = "UnlockWord.WordDatabaseHelper";
 	public static final int TOP_PROCESS_VALUE = 5;
 	public static final String DEFAULT_WORD_FILE = "kaoyan.xmf";
 	public static final String DEFAULT_WORD_TABLE = "word_kaoyan";
@@ -58,10 +60,10 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		this.context = context;
 
-        initDatabaseIfNeed(context);
+        copyDatabaseIfNeed(context);
 	}
 
-    private void initDatabaseIfNeed(Context context){
+    private void copyDatabaseIfNeed(Context context){
         String path = context.getDatabasePath(DATABASE_NAME).getPath();
         SQLiteDatabase db = null;
         try {
@@ -79,8 +81,16 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 
             try {
                 inputStream = context.getAssets().open(DATABASE_NAME);
-                String outFileName = path + DATABASE_NAME;
-                outputStream = new FileOutputStream(outFileName);
+                String dirPath = path.substring(0, path.lastIndexOf(File.separatorChar));
+                File dir = new File(dirPath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                File dbFile = new File(path);
+                if (!dbFile.exists()){
+                    dbFile.createNewFile();
+                }
+                outputStream = new FileOutputStream(dbFile);
 
                 byte[]buffer = new byte[1024];
                 int length;
@@ -107,13 +117,6 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
                 }
             }
         }
-
-
-        this.wordDataBase = this.getWritableDatabase();
-        //创建进度表
-        this.wordDataBase.execSQL(CREATE_WORDPROCESS_TABLE_SQL);
-        Log.i(TAG,"create word process table");
-        this.wordDataBase.close();
     }
 	
 	public void close(){
@@ -122,6 +125,8 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+        db.execSQL(CREATE_WORDPROCESS_TABLE_SQL);
+        Log.i(TAG, "create word process table");
 	}
 
 	@Override
@@ -362,6 +367,7 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 				values.put("phonetic", wordItem.getPhonetic());
 				values.put("tags", wordItem.getTags());
 				db.insertWithOnConflict(tableName, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+
 			}
 		}
 		

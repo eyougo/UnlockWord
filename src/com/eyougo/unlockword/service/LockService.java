@@ -6,14 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.eyougo.unlockword.activity.LockActivity;
+import com.eyougo.unlockword.receiver.ScreenOffReceiver;
 
 public class LockService extends Service {
 
-	private static String TAG = "LockService";
-	private Intent lockIntent = null ;
+	private static String TAG = "UnlockWord.LockService";
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return null;
@@ -23,12 +24,8 @@ public class LockService extends Service {
 		super.onCreate();
 		Log.i(TAG, "service create");
 		
-		lockIntent = new Intent(LockService.this , LockActivity.class);
-		//lockIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT); 
-		lockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		lockIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		
 		/*注册广播*/
+        mScreenOffReceiver = new ScreenOffReceiver();
 		IntentFilter mScreenOffFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
 		LockService.this.registerReceiver(mScreenOffReceiver, mScreenOffFilter);
 	}
@@ -47,18 +44,6 @@ public class LockService extends Service {
 	}
 	
 	//屏幕变暗的广播
-	private BroadcastReceiver mScreenOffReceiver = new BroadcastReceiver(){
-		@Override
-		public void onReceive(Context context , Intent intent) {
-			String action = intent.getAction() ;
-			
-		    Log.i(TAG, intent.toString());
-
-			if(action.equals("android.intent.action.SCREEN_OFF") ){
-				startActivity(lockIntent);
-			}
-		}
-		
-	};
+	private BroadcastReceiver mScreenOffReceiver;
 	
 }

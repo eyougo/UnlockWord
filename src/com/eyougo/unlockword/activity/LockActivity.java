@@ -15,6 +15,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.Bundle;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateFormat;
@@ -35,9 +37,10 @@ import com.eyougo.unlockword.R;
 import com.eyougo.unlockword.data.WordDatabaseHelper;
 import com.eyougo.unlockword.data.WordItem;
 import com.eyougo.unlockword.manager.TimeDateManager;
+import com.eyougo.unlockword.receiver.PhoneCallReceiver;
 
 public class LockActivity extends Activity {
-    private static String TAG = "UnlockWord";
+    private static String TAG = "UnlockWord.LockActivity";
     private String correctAnswer;
     private LockLayer lockLayer;
     private View lockView;
@@ -45,6 +48,8 @@ public class LockActivity extends Activity {
     private int process;
     private WordDatabaseHelper wordDatabaseHelper;
     private TimeDateManager timeDateManager;
+
+    private BroadcastReceiver mPhoneCallReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +63,10 @@ public class LockActivity extends Activity {
         lockLayer.setLockView(lockView);
         lockLayer.lock();
         timeDateManager = new TimeDateManager(lockView, this);
+
+        mPhoneCallReceiver = new PhoneCallReceiver(lockLayer);
+        IntentFilter mScreenOffFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
+        LockActivity.this.registerReceiver(mPhoneCallReceiver, mScreenOffFilter);
     }
 
     private void initViews(View lockView) {
@@ -163,6 +172,7 @@ public class LockActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         timeDateManager.finish();
+        LockActivity.this.unregisterReceiver(mPhoneCallReceiver);
     }
 
     // 屏蔽掉Home键
@@ -182,6 +192,4 @@ public class LockActivity extends Activity {
             return super.onKeyDown(keyCode, event);
 
     }
-
-
 }

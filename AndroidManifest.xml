@@ -10,6 +10,7 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
@@ -39,10 +40,6 @@
 
         <service android:name=".service.LockService" />
 
-        <activity
-            android:name=".activity.HelloActivity"
-            android:label="@string/title_activity_hello" >
-        </activity>
     </application>
 
 </manifest>
