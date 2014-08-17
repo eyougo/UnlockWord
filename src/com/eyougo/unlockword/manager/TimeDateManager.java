@@ -14,6 +14,7 @@ import com.eyougo.unlockword.R;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by mei on 8/2/14.
@@ -24,8 +25,9 @@ public class TimeDateManager {
     private final static String M24 = "kk:mm";
 
     private static Activity mActivity;
-    private String mFormat;
+    private String mTimeFormat;
     private TextView mTimeView;
+    private TextView mDateView;
     private AmPm mAmPm;
 
     private Calendar mCalendar;
@@ -43,7 +45,7 @@ public class TimeDateManager {
         filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
         mActivity.registerReceiver(mTimeChangeReceiver, filter);
 
-        updateTime();
+        updateTimeDate();
     }
 
     public void finish(){
@@ -52,6 +54,7 @@ public class TimeDateManager {
 
     public void initViews(View view) {
         mTimeView = (TextView) view.findViewById(R.id.time);
+        mDateView = (TextView) view.findViewById(R.id.date);
 
         /*创建AmPm对象，参数为设置的字体风格(如可设为Typeface.DEFAULT_BOLD粗体)，
          * 此处参数为空，默认情况。
@@ -61,6 +64,8 @@ public class TimeDateManager {
         mCalendar = Calendar.getInstance();
 
         setDateFormat();
+
+
     }
 
     class AmPm {
@@ -102,25 +107,25 @@ public class TimeDateManager {
                     if (timezoneChanged) {
                         mCalendar = Calendar.getInstance();
                     }
-                    updateTime();
+                    updateTimeDate();
                 }
             });
         }
     }
 
-    ;
-
-    private void updateTime() {
+    private void updateTimeDate() {
         mCalendar.setTimeInMillis(System.currentTimeMillis());
 
-        CharSequence newTime = DateFormat.format("kk:mm", mCalendar);
+        CharSequence newTime = DateFormat.format(mTimeFormat, mCalendar);
         mTimeView.setText(newTime);
         mAmPm.setIsMorning(mCalendar.get(Calendar.AM_PM) == 0);
+
+        mDateView.setText(DateFormat.getDateFormat(mActivity).format(mCalendar.getTime()));
     }
 
     private void setDateFormat() {
-        mFormat = android.text.format.DateFormat.is24HourFormat(mActivity)
+        mTimeFormat = DateFormat.is24HourFormat(mActivity)
                 ? M24 : M12;
-        mAmPm.setShowAmPm(mFormat.equals(M12));
+        mAmPm.setShowAmPm(!DateFormat.is24HourFormat(mActivity));
     }
 }

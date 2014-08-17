@@ -13,6 +13,7 @@
         android:layout_height="match_parent"
         android:gravity="center|center_vertical"
         android:text="@string/data_init"
+        android:textSize="24dp"
         android:layout_gravity="center_vertical" />
 
 </LinearLayout>
