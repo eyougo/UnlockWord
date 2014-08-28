@@ -2,11 +2,22 @@
 <resources>
 
     <string name="app_name">UnlockWord</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="menu_settings">Settings</string>
     <string name="data_init">数据库初始化中，请稍候……</string>
     <string name="right">红色的才是正确答案，点击正确答案解锁！</string>
-    <string name="title_activity_hello">HelloActivity</string>
-    <string name="action_settings">Settings</string>
 
+
+    <string name="title_activity_settings">设置</string>
+
+    <string name="pref_title_choose_dict">选择词库</string>
+
+    <string-array name="pref_dict_list_titles">
+        <item>考研</item>
+        <item>四级</item>
+        <item>六级</item>
+    </string-array>
+    <string-array name="pref_dict_list_values">
+        <item>kaoyan</item>
+        <item>band4</item>
+        <item>band6</item>
+    </string-array>
 </resources>

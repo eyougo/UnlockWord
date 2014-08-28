@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="dict"
+        android:title="@string/pref_title_choose_dict"
+        android:defaultValue="kaoyan"
+        android:entries="@array/pref_dict_list_titles"
+        android:entryValues="@array/pref_dict_list_values"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null" />
+</PreferenceScreen>

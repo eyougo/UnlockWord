@@ -1,9 +1,5 @@
 package com.eyougo.unlockword.activity;
 
-import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
-
 import com.eyougo.unlockword.data.WordItem;
 
 import org.xml.sax.Attributes;

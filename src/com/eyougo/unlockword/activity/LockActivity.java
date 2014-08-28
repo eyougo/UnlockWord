@@ -1,25 +1,13 @@
 package com.eyougo.unlockword.activity;
 
-import java.text.DateFormatSymbols;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Random;
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.Handler;
 import android.os.Bundle;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.format.DateFormat;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -32,12 +20,16 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.eyougo.unlockword.layer.LockLayer;
 import com.eyougo.unlockword.R;
 import com.eyougo.unlockword.data.WordDatabaseHelper;
 import com.eyougo.unlockword.data.WordItem;
+import com.eyougo.unlockword.layer.LockLayer;
 import com.eyougo.unlockword.manager.TimeDateManager;
 import com.eyougo.unlockword.receiver.PhoneCallReceiver;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class LockActivity extends Activity {
     private static String TAG = "UnlockWord.LockActivity";
@@ -65,8 +57,8 @@ public class LockActivity extends Activity {
         timeDateManager = new TimeDateManager(lockView, this);
 
         mPhoneCallReceiver = new PhoneCallReceiver(lockLayer);
-        IntentFilter mScreenOffFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
-        LockActivity.this.registerReceiver(mPhoneCallReceiver, mScreenOffFilter);
+        IntentFilter phoneCallFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
+        LockActivity.this.registerReceiver(mPhoneCallReceiver, phoneCallFilter);
     }
 
     private void initViews(View lockView) {

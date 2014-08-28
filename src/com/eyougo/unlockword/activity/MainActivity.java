@@ -4,11 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 
-import com.eyougo.unlockword.service.LockService;
 import com.eyougo.unlockword.R;
 import com.eyougo.unlockword.data.WordDatabaseHelper;
+import com.eyougo.unlockword.service.LockService;
 
 public class MainActivity extends Activity {
 	@Override
@@ -22,21 +21,11 @@ public class MainActivity extends Activity {
             @Override
             public void run() {
                 WordDatabaseHelper.init(getApplication());
-                Intent mainIntent = new Intent(MainActivity.this,LockActivity.class);
+                Intent mainIntent = new Intent(MainActivity.this,SettingsActivity.class);
                 MainActivity.this.startActivity(mainIntent);
                 MainActivity.this.finish();
             }
 
         }, 1000);
     }
-
-    private Handler mMainHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            WordDatabaseHelper.init(getApplication());
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.setClass(getApplication(), LockActivity.class);
-            startActivity(intent);
-        }
-    };
 }
