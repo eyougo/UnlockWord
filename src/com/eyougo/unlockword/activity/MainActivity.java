@@ -26,6 +26,6 @@ public class MainActivity extends Activity {
                 MainActivity.this.finish();
             }
 
-        }, 1000);
+        }, 2000);
     }
 }

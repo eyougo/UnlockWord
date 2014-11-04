@@ -46,14 +46,15 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
     public static void init(Context context){
         if (instance == null) {
             instance = new WordDatabaseHelper(context);
+            instance.wordDataBase = instance.getWritableDatabase();
         }
     }
 
     public static WordDatabaseHelper getInstance(Context context){
         if (instance == null) {
             instance = new WordDatabaseHelper(context);
+            instance.wordDataBase = instance.getWritableDatabase();
         }
-        instance.wordDataBase = instance.getWritableDatabase();
         return instance;
     }
 
@@ -61,10 +62,10 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		this.context = context;
 
-        copyDatabaseIfNeed(context);
+        copyDatabase(context, false);
 	}
 
-    private void copyDatabaseIfNeed(Context context){
+    private void copyDatabase(Context context, boolean must){
         String path = context.getDatabasePath(DATABASE_NAME).getPath();
         SQLiteDatabase db = null;
         try {
@@ -76,7 +77,7 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
                 db.close();
             }
         }
-        if (db == null){
+        if (db == null || must == true){
             InputStream inputStream = null;
             OutputStream outputStream = null;
 
@@ -133,9 +134,15 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 	    if (newVersion == DATABASE_VERSION && oldVersion < DATABASE_VERSION){
-            copyDatabaseIfNeed(this.context);
+            copyDatabase(this.context, true);
+            db.execSQL(CREATE_WORDPROCESS_TABLE_SQL);
         }
 	}
+
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        return;
+    }
 	
 	public int getWordCount(String tableName){
 		Cursor cursor = wordDataBase.rawQuery("select count(*) from " + tableName, null);
