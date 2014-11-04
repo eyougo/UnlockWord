@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -38,6 +39,8 @@ public class LockActivity extends Activity {
     private View lockView;
     private String word;
     private int process;
+    private int right;
+    private String dictName;
     private WordDatabaseHelper wordDatabaseHelper;
     private TimeDateManager timeDateManager;
 
@@ -62,16 +65,33 @@ public class LockActivity extends Activity {
     }
 
     private void initViews(View lockView) {
+        right = 0;
+        dictName =  PreferenceManager
+                .getDefaultSharedPreferences(this.getApplicationContext())
+                .getString(this.getString(R.string.pref_key_choose_dict), "word_kaoyan");
+
+        initQuestion();
+
+
+        // 设置处理
+        RadioGroup radioGroup = (RadioGroup) lockView.findViewById(R.id.radioGroup);
+        radioGroup.setOnCheckedChangeListener(new RadioGroupOnCheckedChangeListener());
+
+    }
+
+    private void initQuestion(){
+
         // 隐藏提示
         TextView tips = (TextView)lockView.findViewById(R.id.tips);
         tips.setVisibility(View.GONE);
 
+        // 获取单词
         wordDatabaseHelper = WordDatabaseHelper.getInstance(this);
-        WordItem wordItem = wordDatabaseHelper.getRandomWordItem("word_kaoyan", null);
+        WordItem wordItem = wordDatabaseHelper.getRandomWordItem(dictName, null);
 
         List<String> otherTrans = new ArrayList<String>();
         while (otherTrans.size() < 3) {
-            String trans = wordDatabaseHelper.getRandomOtherTrans("word_kaoyan", wordItem.getWord());
+            String trans = wordDatabaseHelper.getRandomOtherTrans(dictName, wordItem.getWord());
             if (!otherTrans.contains(trans)) {
                 otherTrans.add(trans);
             }
@@ -116,11 +136,9 @@ public class LockActivity extends Activity {
         RadioButton radioButton3 = (RadioButton) lockView.findViewById(R.id.radio3);
         radioButton3.setText(answers.get(3));
 
-        // 设置处理
-        RadioGroup radioGroup = (RadioGroup) lockView.findViewById(R.id.radioGroup);
-        radioGroup
-                .setOnCheckedChangeListener(new RadioGroupOnCheckedChangeListener());
 
+        RadioGroup radioGroup = (RadioGroup) lockView.findViewById(R.id.radioGroup);
+        radioGroup.clearCheck();
     }
 
     private class RadioGroupOnCheckedChangeListener implements
@@ -129,6 +147,9 @@ public class LockActivity extends Activity {
         @Override
         public void onCheckedChanged(RadioGroup group, int checkedId) {
             RadioButton radioButton = (RadioButton) lockView.findViewById(checkedId);
+            if (radioButton == null){
+                return;
+            }
             String answer = String.valueOf(radioButton.getText());
             Log.i(TAG, "checkedId="+checkedId+",answer="+answer );
             if (answer == null) {
@@ -136,12 +157,22 @@ public class LockActivity extends Activity {
                 wordDatabaseHelper.close();
             }
             if (answer.equals(correctAnswer)) {
-                Toast.makeText(getBaseContext(), "恭喜你，答对了！", Toast.LENGTH_SHORT)
-                        .show();
+                int maxRight = Integer.parseInt(PreferenceManager
+                        .getDefaultSharedPreferences(getApplicationContext())
+                        .getString(getApplicationContext().getString(R.string.pref_key_right_count), "1"));
+                right ++ ;
                 wordDatabaseHelper.processForward(word, process, false);
-                wordDatabaseHelper.close();
-                lockLayer.unlock();
-                finish();
+                if (right < maxRight) {
+                    Toast.makeText(getBaseContext(), "恭喜你，答对了！再来一题！", Toast.LENGTH_LONG)
+                            .show();
+                    initQuestion();
+                }else {
+                    Toast.makeText(getBaseContext(), "恭喜你，答对了！解锁！", Toast.LENGTH_LONG)
+                            .show();
+                    wordDatabaseHelper.close();
+                    lockLayer.unlock();
+                    finish();
+                }
             }else{
                 RadioGroup radioGroup = (RadioGroup) lockView.findViewById(R.id.radioGroup);
                 int c = radioGroup.getChildCount();

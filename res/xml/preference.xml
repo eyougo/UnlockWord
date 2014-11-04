@@ -2,11 +2,27 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
-        android:key="dict"
+        android:key="@string/pref_key_choose_dict"
         android:title="@string/pref_title_choose_dict"
-        android:defaultValue="kaoyan"
+        android:defaultValue="@string/pref_default_dict"
         android:entries="@array/pref_dict_list_titles"
         android:entryValues="@array/pref_dict_list_values"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null" />
+    <EditTextPreference
+        android:key="@string/pref_key_right_count"
+        android:title="@string/pref_title_right_count"
+        android:defaultValue="@string/pref_default_right_count"
+        android:inputType="number"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:numeric="integer"/>
+    <EditTextPreference
+        android:key="@string/pref_key_max_process"
+        android:title="@string/pref_title_max_process"
+        android:defaultValue="@string/pref_default_max_process"
+        android:inputType="number"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:numeric="integer"/>
 </PreferenceScreen>

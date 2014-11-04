@@ -26,7 +26,9 @@ public class SettingsActivity extends PreferenceActivity {
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
         // their values. When their values change, their summaries are updated
         // to reflect the new value, per the Android Design guidelines.
-        bindPreferenceSummaryToValue(findPreference("dict"));
+        bindPreferenceSummaryToValue(findPreference(this.getString(R.string.pref_key_choose_dict)));
+        bindPreferenceSummaryToValue(findPreference(this.getString(R.string.pref_key_right_count)));
+        bindPreferenceSummaryToValue(findPreference(this.getString(R.string.pref_key_max_process)));
     }
 
     /**

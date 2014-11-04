@@ -24,15 +24,16 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.eyougo.unlockword.R;
 
 public class WordDatabaseHelper extends SQLiteOpenHelper {
 	private static String TAG = "UnlockWord.WordDatabaseHelper";
-	public static final int TOP_PROCESS_VALUE = 5;
-	public static final String DEFAULT_WORD_FILE = "kaoyan.xmf";
-	public static final String DEFAULT_WORD_TABLE = "word_kaoyan";
 	public static final String DATABASE_NAME = "unlockword.db";
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 2;
 	public static final String CREATE_WORDPROCESS_TABLE_SQL = "create table if not exists word_process (" +
 			" word TEXT PRIMARY KEY, process INTEGER)";
 	
@@ -131,7 +132,9 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		
+	    if (newVersion == DATABASE_VERSION && oldVersion < DATABASE_VERSION){
+            copyDatabaseIfNeed(this.context);
+        }
 	}
 	
 	public int getWordCount(String tableName){
@@ -144,6 +147,10 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 	}
 	
 	public List<WordItem> getRandomOtherWordItemList(int number, String table, String exceptWord){
+        String maxProcess =  PreferenceManager
+                .getDefaultSharedPreferences(context)
+                .getString(context.getString(R.string.pref_key_max_process), "5");
+
 		List<WordItem> list = new ArrayList<WordItem>(number);
 		int count = getWordCount(table);
 		Random random = new Random();
@@ -152,7 +159,7 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 				" t left join word_process p on t.word = p.word" +
 				" where t.word <> ? and (process < ? or process is null) limit ? offset ?";
 		Cursor cursor = wordDataBase.rawQuery(sql, 
-				new String[]{exceptWord, String.valueOf(TOP_PROCESS_VALUE), String.valueOf(number), String.valueOf(offset)});
+				new String[]{exceptWord, maxProcess , String.valueOf(number), String.valueOf(offset)});
 		while (cursor.moveToNext()) {
 			WordItem wordItem = new WordItem();
 			wordItem.setWord(cursor.getString(cursor.getColumnIndex("word")));
@@ -167,6 +174,9 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 	}
 	
 	public WordItem getRandomWordItem(String table, String exceptWord){
+        String maxProcess =  PreferenceManager
+                .getDefaultSharedPreferences(context)
+                .getString(context.getString(R.string.pref_key_max_process), "5");
 		int count = getWordCount(table);
 		Random random = new Random();
 		int offset = random.nextInt(count);
@@ -175,7 +185,7 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 		sqlBuffer.append("select t.word, t.trans, t.phonetic, t.tags, p.process from " )
 			.append(table).append(" t left join word_process p on t.word = p.word")
 			.append(" where (process < ? or process is null) ");
-		argList.add(String.valueOf(TOP_PROCESS_VALUE));
+		argList.add(maxProcess);
 		if (exceptWord != null) {
 			sqlBuffer.append("and t.word != ? ");
 			argList.add(exceptWord);
@@ -230,11 +240,15 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 	}
 	
 	public void processForward(String word, int process, boolean top){
+        int maxProcess =  Integer.parseInt(PreferenceManager
+                .getDefaultSharedPreferences(context)
+                .getString(context.getString(R.string.pref_key_max_process), "5"));
+
 		wordDataBase.beginTransaction();
 		if (process > 0) {
 			ContentValues values = new ContentValues();
 			if (top) {
-				process = TOP_PROCESS_VALUE;
+				process = maxProcess;
 			}else {
 				process ++;
 			}
@@ -244,7 +258,7 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 			ContentValues values = new ContentValues();
 			values.put("word", word);
 			if (top) {
-				process = TOP_PROCESS_VALUE;
+				process = maxProcess;
 			}else {
 				process = 1;
 			}

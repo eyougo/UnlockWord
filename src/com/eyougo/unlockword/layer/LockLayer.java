@@ -32,20 +32,20 @@ public class LockLayer {
 		mLockViewLayoutParams.width = LayoutParams.MATCH_PARENT;
 		mLockViewLayoutParams.height = LayoutParams.MATCH_PARENT;
 		//实现关键
-		//mLockViewLayoutParams.type = LayoutParams.TYPE_SYSTEM_ERROR;
+		mLockViewLayoutParams.type = LayoutParams.TYPE_SYSTEM_ALERT;
 		// 此行代码有时在主界面键按下情况下会出现无法显示和退出，暂时去掉，去掉之后按下主界面键会直接返回主界面
 
 		//apktool value，这个值具体是哪个变量还请网友帮忙
 		//mLockViewLayoutParams.flags = 1280;
 	}
 	public synchronized void lock() {
-		if(mLockView!=null&&!isLocked){
+		if(mLockView!=null && !isLocked){
 			mWindowManager.addView(mLockView, mLockViewLayoutParams);
 		}
 		isLocked = true;
 	}
 	public synchronized void unlock() {
-		if(mWindowManager!=null&&isLocked){
+		if(mWindowManager!=null && isLocked){
 			mWindowManager.removeView(mLockView);
 		}
 		isLocked = false;

@@ -8,16 +8,25 @@
 
     <string name="title_activity_settings">设置</string>
 
+    <string name="pref_key_choose_dict">dict</string>
     <string name="pref_title_choose_dict">选择词库</string>
-
+    <string name="pref_default_dict">word_kaoyan</string>
     <string-array name="pref_dict_list_titles">
         <item>考研</item>
         <item>四级</item>
         <item>六级</item>
     </string-array>
     <string-array name="pref_dict_list_values">
-        <item>kaoyan</item>
-        <item>band4</item>
-        <item>band6</item>
+        <item>word_kaoyan</item>
+        <item>word_cet4</item>
+        <item>word_cet6</item>
     </string-array>
+
+    <string name="pref_key_right_count">right</string>
+    <string name="pref_title_right_count">解锁所需答对题数，默认为1</string>
+    <string name="pref_default_right_count">1</string>
+
+    <string name="pref_key_max_process">process</string>
+    <string name="pref_title_max_process">单词不再复现所需累积答对次数，默认为5</string>
+    <string name="pref_default_max_process">5</string>
 </resources>

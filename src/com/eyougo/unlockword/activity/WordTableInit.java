@@ -26,7 +26,7 @@ public class WordTableInit {
         try {
             xmlReader = saxParserFactory.newSAXParser().getXMLReader();
             xmlReader.setContentHandler(new WordXmlHandler("word_kaoyan"));
-            inputStream = new FileInputStream("assets/kaoyan.xmf");
+            inputStream = new FileInputStream("assets/kaoyan.xml");
             InputSource inputSource = new InputSource(inputStream);
             inputSource.setEncoding("UTF-8");
             xmlReader.parse(inputSource);
