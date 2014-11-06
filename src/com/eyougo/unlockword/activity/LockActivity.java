@@ -60,7 +60,7 @@ public class LockActivity extends Activity {
         timeDateManager = new TimeDateManager(lockView, this);
 
         mPhoneCallReceiver = new PhoneCallReceiver(lockLayer);
-        IntentFilter phoneCallFilter = new IntentFilter("android.intent.action.SCREEN_OFF");
+        IntentFilter phoneCallFilter = new IntentFilter("android.intent.action.PHONE_STATE");
         LockActivity.this.registerReceiver(mPhoneCallReceiver, phoneCallFilter);
     }
 
@@ -163,8 +163,6 @@ public class LockActivity extends Activity {
                 right ++ ;
                 wordDatabaseHelper.processForward(word, process, false);
                 if (right < maxRight) {
-                    Toast.makeText(getBaseContext(), "恭喜你，答对了！再来一题！", Toast.LENGTH_LONG)
-                            .show();
                     initQuestion();
                 }else {
                     Toast.makeText(getBaseContext(), "恭喜你，答对了！解锁！", Toast.LENGTH_LONG)

@@ -27,6 +27,6 @@
     <string name="pref_default_right_count">1</string>
 
     <string name="pref_key_max_process">process</string>
-    <string name="pref_title_max_process">单词不再复现所需累积答对次数，默认为5</string>
+    <string name="pref_title_max_process">单词掌握所需答对次数，默认为5</string>
     <string name="pref_default_max_process">5</string>
 </resources>

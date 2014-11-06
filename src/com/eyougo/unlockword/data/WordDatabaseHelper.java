@@ -47,14 +47,15 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
         if (instance == null) {
             instance = new WordDatabaseHelper(context);
             instance.wordDataBase = instance.getWritableDatabase();
+            instance.wordDataBase.execSQL(CREATE_WORDPROCESS_TABLE_SQL);
         }
     }
 
     public static WordDatabaseHelper getInstance(Context context){
         if (instance == null) {
-            instance = new WordDatabaseHelper(context);
-            instance.wordDataBase = instance.getWritableDatabase();
+            init(context);
         }
+        instance.wordDataBase = instance.getWritableDatabase();
         return instance;
     }
 
@@ -62,22 +63,22 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		this.context = context;
 
-        copyDatabase(context, false);
+        copyDatabase(context);
 	}
 
-    private void copyDatabase(Context context, boolean must){
+    private void copyDatabase(Context context){
         String path = context.getDatabasePath(DATABASE_NAME).getPath();
         SQLiteDatabase db = null;
         try {
             db = SQLiteDatabase.openDatabase(path, null, SQLiteDatabase.OPEN_READONLY);
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
 
-        }finally {
-            if (db != null){
+        } finally {
+            if (db != null) {
                 db.close();
             }
         }
-        if (db == null || must == true){
+        if (db == null){
             InputStream inputStream = null;
             OutputStream outputStream = null;
 
@@ -104,6 +105,7 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
                 outputStream.flush();
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.e(TAG, e.getMessage(), e);
             } finally {
                 if (outputStream != null){
                     try {
@@ -127,16 +129,14 @@ public class WordDatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_WORDPROCESS_TABLE_SQL);
-        Log.i(TAG, "create word process table");
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-	    if (newVersion == DATABASE_VERSION && oldVersion < DATABASE_VERSION){
-            copyDatabase(this.context, true);
-            db.execSQL(CREATE_WORDPROCESS_TABLE_SQL);
-        }
+        copyDatabase(this.context);
+        db.execSQL(CREATE_WORDPROCESS_TABLE_SQL);
+        importWordTable("cet4.xml","word_cet4",db);
+        importWordTable("cet6.xml","word_cet6",db);
 	}
 
     @Override
