@@ -3,6 +3,8 @@ UnlockWord
 
 Android lock screen application in order to memorize english words.
 
+http://www.appchina.com/app/com.eyougo.unlockword
+
 已解决问题：
  * 与4.0系统的兼容。
  * 干扰答案随机。
